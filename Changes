@@ -1,0 +1,6 @@
+Revision history for Perl extension Device::Modem::GSM.
+
+0.01  Mon Dec 17 12:59:25 2007
+	- original version; created by h2xs 1.23 with options
+		-X Device::Modem::GSM
+
