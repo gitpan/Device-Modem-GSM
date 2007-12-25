@@ -6,11 +6,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # Perl licensing terms for details.
 #
-# $Id: GSM.pm 12 2007-12-25 13:40:02Z kattoo $
+# $Id: GSM.pm 14 2007-12-25 21:41:48Z kattoo $
 
 =head1 NAME
 
-Device::Modem::GSM - Perl module to communicate with a GSM cell phone connected via some sort of Serial port.
+Device::Modem::GSM - Perl module to communicate with a GSM cell phone connected via some sort of Serial port (including but not limited to most USB data cables, IrDA, ... others ?).
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ use warnings;
 use Carp;
 use Device::Modem;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 our @ISA = ("Device::Modem");
 
 =head1 METHODS
@@ -83,6 +83,9 @@ SM is the SIM card
 ME is the phone memory
 
 =back
+
+Ex :
+ $gsm->pb_storage("SM");
 
 =back
 
@@ -167,10 +170,12 @@ sub pb_storage_ok {
 
 This method will write an entry into the phonebook.
 
- pb_write_entry(
+Ex :
+
+ $gsm->pb_write_entry(
      index => 1,
      text => 'John Doe',
-     number => '+3312345')
+     number => '+3312345');
 
 The "index" parameter specifies the storage slot to fill. If none specified, then the first empty is used.
 
@@ -244,7 +249,8 @@ sub pb_write_entry {
 
 This method will erase the entry at the specified index of the storage
 
- pb_erase(10)
+Ex :
+ $gsm->pb_erase(10);
 
 =back
 
@@ -269,6 +275,9 @@ sub pb_erase {
 
 This method will clear the whole phonebook for the used storage. Handle with care !
 
+Ex :
+ $gsm->pb_erase_all;
+
 =back
 
 =cut
@@ -291,6 +300,8 @@ sub pb_erase_all {
 =over 4
 
 This method will fetch the specified entries in the phonebook storage and return them in a reference to an array. Each cell of the array is a reference to a hash holding the information.
+
+Ex :
 
  my $entries = $gsm->pb_read_entries(1,10);
 
@@ -379,6 +390,48 @@ sub pb_read_all {
 		$self->{pb_storage_max}
 	);
 }
+
+=head2 sms_send
+
+=over 4
+
+This method will let you send an SMS to the specified phone number
+
+Ex :
+
+ $gsm->sms_send("+33123456", "Message to send as an SMS");
+
+=back
+
+=cut
+
+sub sms_send {
+	my $self = shift;
+	my $number = shift;
+	my $sms = shift;
+
+	# sets the SMS format to TEXT instead of default PDU
+	my $atcmd = "AT+CMGF=1" . Device::Modem::CR;
+	$self->atsend($atcmd);
+	my ($result, @lines) = $self->parse_answer;
+
+	if ($result ne 'OK') {
+		carp('Failed to set SMS format to text');
+		return undef;
+	}
+	$atcmd = "AT+CMGS=\"".$number."\"".Device::Modem::CR;
+	$self->atsend($atcmd);
+	$result = $self->answer; # to collect the > sign
+	$atcmd = $sms . chr(26); # ^Z terminated string
+	$self->atsend($atcmd);
+	($result, @lines) = $self->parse_answer(qr/OK|ERROR/, 10000);;
+	if ($result ne "OK") {
+		carp('Unable to send SMS');
+		return undef;
+	}
+	return 1;
+}
+
 
 1;
 

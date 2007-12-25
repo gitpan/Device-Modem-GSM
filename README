@@ -1,4 +1,4 @@
-Device-Modem-GSM version 0.2
+Device-Modem-GSM version 0.3
 =============================
 
 This module helps accessing GSM mobiles functions through AT-commands (like
