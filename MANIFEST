@@ -4,3 +4,4 @@ MANIFEST
 README
 t/Device-Modem-GSM.t
 lib/Device/Modem/GSM.pm
+META.yml                                 Module meta-data (added by MakeMaker)

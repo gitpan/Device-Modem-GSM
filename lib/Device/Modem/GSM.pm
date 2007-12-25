@@ -6,7 +6,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # Perl licensing terms for details.
 #
-# $Id$
+# $Id: GSM.pm 12 2007-12-25 13:40:02Z kattoo $
 
 =head1 NAME
 
@@ -59,7 +59,7 @@ use warnings;
 use Carp;
 use Device::Modem;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 our @ISA = ("Device::Modem");
 
 =head1 METHODS
